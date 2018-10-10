@@ -25,7 +25,7 @@ function wrongOption() {
 }
 
 function helpDoc() {
-    echo -e "usage: build <solution> [-r] [-k | -c]
+    echo "usage: build <solution> [-r] [-k | -c]
     <solution>: 题解名称, 如 P1000
     [-r]: 仅运行题解
     [-k | -c]: 题解的语言, 默认为 \"CXX\"
@@ -72,11 +72,9 @@ function preRunKotlin() {
     echo "Compiling ${solution}.kt"
     kotlinc -d "${buildDir}/kotlin/" ${sourceDir}/${solution}.kt
 
-    local content="
-    #!/usr/bin/env bash\n
-    cd ${buildDir}/kotlin;
-    kotlin _${solution}Kt
-    "
+    local content="#!/usr/bin/env bash\n
+cd ${buildDir}/kotlin\n
+kotlin ${solution}Kt"
 
     echo -e ${content} > ${genTarget}
 }
