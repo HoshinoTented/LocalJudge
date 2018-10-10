@@ -14,7 +14,7 @@ projectName="工程名称"
 genTarget="生成目标路径"
 ```  
 随后, 运行以下命令  
-```Shell
-./build <problemid>
+```bash
+./build problemid
 ```
 更多信息请运行 `./build -help`  
