@@ -13,10 +13,9 @@ genTarget=""
 
 # 读取配置文件(key=value)
 function loadConfig() {
-    while read line
-    do
-	eval "${line}"
-    done < configFile
+    while read line; do
+        eval "${line}"
+    done < ${configFile}
 }
 
 function wrongOption() {
@@ -51,13 +50,13 @@ function loadOptions() {
             elif [ "${option}" = "c" ]
             then
                 language="CXX"
-	    elif [ "${option}" = "help" ]
-	    then
-		helpDoc
-		return 255
+            elif [ "${option}" = "help" ]
+            then
+                helpDoc
+                return 255
             else
-		echo "Unknown command -${option}"
-		wrongOption
+                echo "Unknown command -${option}"
+                wrongOption
                 return 255
             fi
         else
