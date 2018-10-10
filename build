@@ -25,13 +25,12 @@ function wrongOption() {
 }
 
 function helpDoc() {
-    echo -e "
-usage: build <solution> [-r] [-k | -c]
-    -r: 仅运行题解
-    -k, -c: 题解的语言, 默认为 \"CXX\"
+    echo -e "usage: build <solution> [-r] [-k | -c]
+    <solution>: 题解名称, 如 P1000
+    [-r]: 仅运行题解
+    [-k | -c]: 题解的语言, 默认为 \"CXX\"
             -k 为 Kotlin
-            -c 为 CXX
-"
+            -c 为 CXX"
 }
 
 # 返回 0 表示无错误
