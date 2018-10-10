@@ -3,7 +3,13 @@
 justRun=0
 language="CXX"
 solution=""
-configFile="config.properties"
+configFile="config.sh"
+
+projectRoot=""
+buildDir=""
+judgeDir=""
+projectName=""
+genTarget=""
 
 # 读取配置文件(key=value)
 function loadConfig() {

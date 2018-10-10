@@ -3,7 +3,7 @@
 当然, 看到 `.kts` 这个~~高级的~~文件后缀就知道需要 [`kotlin`](https://kotlinlang.org) 编译器了
 
 # 如何使用
-首先, 创建一个配置文件 `config.properties`  
+首先, 创建一个配置文件 `config.sh`  
 需要包含如下内容  
 ```
 projectRoot="工程的根目录"
