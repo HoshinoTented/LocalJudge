@@ -5,11 +5,13 @@ language="CXX"
 solution=""
 configFile="config.sh"
 
+# read from config.sh
 projectRoot=""
 buildDir=""
 judgeDir=""
 projectName=""
 genTarget=""
+sourceDir=""
 
 # 读取配置文件(key=value)
 function loadConfig() {
@@ -69,7 +71,7 @@ function loadOptions() {
 
 function preRunKotlin() {
     echo "Compiling ${solution}.kt"
-    kotlinc -d "${buildDir}/kotlin/" ../src/${solution}.kt
+    kotlinc -d "${buildDir}/kotlin/" ${sourceDir}/${solution}.kt
 
     local content="
     #!/usr/bin/env bash\n
@@ -98,7 +100,7 @@ function runSolution() {
     then
         ${genTarget}
     else
-        ./judge.kts ${solution} ${projectRoot}
+        ${judgeDir}/judge.kts ${solution} ${projectRoot}
     fi
 }
 

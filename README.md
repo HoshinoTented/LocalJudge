@@ -9,6 +9,7 @@
 projectRoot="工程的根目录"
 buildDir="工程的输出目录"
 judgeDir="评测脚本所在目录"
+sourceDir="题解所在目录"
 projectName="工程名称"
 genTarget="生成目标路径"
 ```  
