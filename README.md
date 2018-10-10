@@ -5,7 +5,7 @@
 # 如何使用
 首先, 创建一个配置文件 `config.sh`  
 需要包含如下内容  
-```
+```bash
 projectRoot="工程的根目录"
 buildDir="工程的输出目录"
 judgeDir="评测脚本所在目录"
