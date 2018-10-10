@@ -4,15 +4,18 @@ import java.io.*
 import java.nio.file.Paths
 import java.util.Scanner
 
-val prefix = ".."
+val pid = args.getOrNull(0) ?: throw RuntimeException("Please input problem id")
+val prefix = args.getOrNull(1) ?: "."
+val testDir = File("${prefix}/test/$pid/")
+val executable = "$prefix/build/LuoGu"
 val runtime : Runtime = Runtime.getRuntime()
 
-class JudgeException(val problem : Int, msg : String) : Exception("Problem $problem : $msg")
+class JudgeException(val problem : String, msg : String) : Exception("Problem $problem : $msg")
 
-fun process(id : Int, input : String, output : String) : Long {
+fun process(id : String, input : String, output : String) : Long {
 	val start = System.currentTimeMillis()
 
-	val proc : Process = runtime.exec("$prefix/build/LuoGu")
+	val proc : Process = runtime.exec(executable)
 	val stdin : OutputStream = proc.outputStream
 	val stdout : InputStream = proc.inputStream
 
@@ -40,9 +43,6 @@ fun process(id : Int, input : String, output : String) : Long {
 
 	return end - start
 }
-
-val pid = args.getOrNull(0)?.toInt() ?: throw RuntimeException("Please input problem id")
-val testDir = File("${prefix}/test/$pid/")
 
 if (! testDir.exists()) throw JudgeException(pid, "No found test data")
 

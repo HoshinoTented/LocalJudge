@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+justRun=0
+language="CXX"
+solution=""
+configFile="config.properties"
+
+# 读取配置文件(key=value)
+function loadConfig() {
+    while read line
+    do
+	eval "${line}"
+    done < configFile
+}
+
+function wrongOption() {
+    echo "Use \"-help\" to get more infomation"
+}
+
+function helpDoc() {
+    echo -e "
+usage: build <solution> [-r] [-k | -c]
+    -r: 仅运行题解
+    -k, -c: 题解的语言, 默认为 \"CXX\"
+            -k 为 Kotlin
+            -c 为 CXX
+"
+}
+
+# 返回 0 表示无错误
+# 返回 255 表示结束脚本运行
+function loadOptions() {
+    # 读入运行选项
+    for param in "$@"
+    do
+        if [ "${param:0:1}" = "-" ]
+        then
+            local option=${param:1}
+            if [ "${option}" = "r" ]
+            then
+                justRun=1
+            elif [ "${option}" = "k" ]
+            then
+                language="Kotlin"
+            elif [ "${option}" = "c" ]
+            then
+                language="CXX"
+	    elif [ "${option}" = "help" ]
+	    then
+		helpDoc
+		return 255
+            else
+		echo "Unknown command -${option}"
+		wrongOption
+                return 255
+            fi
+        else
+            solution=${param}
+        fi
+    done
+
+    return 0
+}
+
+function preRunKotlin() {
+    echo "Compiling ${solution}.kt"
+    kotlinc -d "${buildDir}/kotlin/" ../src/${solution}.kt
+
+    local content="
+    #!/usr/bin/env bash\n
+    cd ${buildDir}/kotlin;
+    kotlin _${solution}Kt
+    "
+
+    echo -e ${content} > ${genTarget}
+}
+
+function preRunCXX() {
+    local header="
+    #include \"src/${solution}.hpp\"
+    "
+
+    echo ${header} > ${projectRoot}/main.cpp
+
+    cd ${buildDir}
+    make
+    cd ${judgeDir}
+}
+
+function runSolution() {
+    echo "See https://www.luogu.org/problemnew/show/${solution} for more information"
+    if [ "${justRun}" == 1 ]
+    then
+        ${genTarget}
+    else
+        ./judge.kts ${solution} ${projectRoot}
+    fi
+}
+
+loadConfig
+loadOptions "$@"
+
+if [ $? == 255 ]
+then
+    exit
+elif [ "${solution}" = "" ]
+then
+    echo "Please input solution id"
+    wrongOption
+else
+    # 根据运行选项生成不同的运行程序
+    preRun${language}
+
+    # 运行生成后的程序
+    runSolution
+fi
