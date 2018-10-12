@@ -6,8 +6,9 @@ import java.util.Scanner
 
 val pid = args.getOrNull(0) ?: throw RuntimeException("Please input problem id")
 val prefix = args.getOrNull(1) ?: "."
-val testDir = File("${prefix}/test/$pid/")
-val executable = "$prefix/build/LuoGu"
+val projectName = args.getOrNull(2) ?: throw RuntimeException("Unknown Project Name")
+val testDir = File("$prefix/test/$pid/")
+val executable = "$prefix/build/$projectName"
 val runtime : Runtime = Runtime.getRuntime()
 
 class JudgeException(val problem : String, msg : String) : Exception("Problem $problem : $msg")
@@ -29,13 +30,25 @@ fun process(id : String, input : String, output : String) : Long {
 	val outS = Scanner(stdout)
 	val ansS = Scanner(output)
 
-	while (outS.hasNext()/* && ansS.hasNext()*/) {
-		val out = outS.next()
-		val ans = ansS.next()
+	var line = 1
 
-		if (out != ans) {
-			throw JudgeException(id, """expect "$ans", but got "$out"""")
+	while (outS.hasNext()) {
+		val out = outS.nextLine().trimEnd()
+		val ans = ansS.nextLine().trimEnd()
+
+		(1 until out.length).forEach {
+			val outC = out[it]
+			val ansC = ans[it]
+			val isPrint : (Char) -> String = { c ->
+				if (' '.toInt() < c.toInt()) c.toString() else "ASCII(${c.toInt()})"
+			}
+
+			if (outC != ansC) {
+				throw JudgeException(id, "line $line, expect ${isPrint(ansC)} but got ${isPrint(outC)}")
+			}
 		}
+
+		++ line
 	}
 
 	val end = System.currentTimeMillis()

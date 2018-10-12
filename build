@@ -97,7 +97,8 @@ function runSolution() {
     then
         ${genTarget}
     else
-        ${judgeDir}/judge.kts ${solution} ${projectRoot}
+        echo "Running judge script"
+        ${judgeDir}/judge.kts ${solution} ${projectRoot} ${projectName}
     fi
 }
 
