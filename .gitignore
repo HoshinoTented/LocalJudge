@@ -4,3 +4,7 @@
 
 # config
 config.sh
+
+# intellij
+.idea/
+*.iml

@@ -36,7 +36,7 @@ fun process(id : String, input : String, output : String) : Long {
 		val out = outS.nextLine().trimEnd()
 		val ans = ansS.nextLine().trimEnd()
 
-		(1 until out.length).forEach {
+		(0 until out.length).forEach {
 			val outC = out[it]
 			val ansC = ans[it]
 			val isPrint : (Char) -> String = { c ->
@@ -44,7 +44,7 @@ fun process(id : String, input : String, output : String) : Long {
 			}
 
 			if (outC != ansC) {
-				throw JudgeException(id, "line $line, expect ${isPrint(ansC)} but got ${isPrint(outC)}")
+				throw JudgeException(id, "line $line column ${it + 1}, expect ${isPrint(ansC)} but got ${isPrint(outC)}")
 			}
 		}
 
