@@ -15,9 +15,11 @@ sourceDir=""
 
 # 读取配置文件(key=value)
 function loadConfig() {
-    while read line; do
-        eval "${line}"
-    done < ${configFile}
+#    while read line; do
+#        eval "${line}"
+#    done < ${configFile}
+
+    source ${configFile}
 }
 
 function wrongOption() {
