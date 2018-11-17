@@ -44,24 +44,40 @@ function loadOptions() {
         if [ "${param:0:1}" = "-" ]
         then
             local option=${param:1}
-            if [ "${option}" = "r" ]
-            then
-                justRun=1
-            elif [ "${option}" = "k" ]
-            then
-                language="Kotlin"
-            elif [ "${option}" = "c" ]
-            then
-                language="CXX"
-            elif [ "${option}" = "help" ]
-            then
+#            if [ "${option}" = "r" ]
+#            then
+#                justRun=1
+#            elif [ "${option}" = "k" ]
+#            then
+#                language="Kotlin"
+#            elif [ "${option}" = "c" ]
+#            then
+#                language="CXX"
+#            elif [ "${option}" = "help" ]
+#            then
+#                helpDoc
+#                exit
+#            else
+#                echo "Unknown command '-${option}'"
+#                wrongOption
+#                exit
+#            fi
+            case "${option}" in
+            "r")
+               justRun=1 ;;
+
+            "k")
+                language="Kotlin" ;;
+            "c")
+                language="CXX" ;;
+            "help")
                 helpDoc
-                return 255
-            else
-                echo "Unknown command -${option}"
+                exit ;;
+            *)
+                echo "Unknown command '${param}'"
                 wrongOption
-                return 255
-            fi
+                exit ;;
+            esac
         else
             solution=${param}
         fi
@@ -72,13 +88,13 @@ function loadOptions() {
 
 function preRunKotlin() {
     echo "Compiling ${solution}.kt"
-    kotlinc -d "${buildDir}/kotlin/" ${sourceDir}/${solution}.kt
+    kotlinc -d "${buildDir}/kotlin/" "${sourceDir}/${solution}.kt"
 
     local content="#!/usr/bin/env bash\n
 cd ${buildDir}/kotlin\n
 kotlin ${solution}Kt"
 
-    echo -e ${content} > ${genTarget}
+    echo -e "${content}" > "${genTarget}"
 }
 
 function preRunCXX() {
@@ -86,11 +102,11 @@ function preRunCXX() {
     #include \"src/${solution}.hpp\"
     "
 
-    echo ${header} > ${projectRoot}/main.cpp
+    echo "${header}" > "${projectRoot}/main.cpp"
 
-    cd ${buildDir}
+    cd "${buildDir}"
     make
-    cd ${judgeDir}
+    cd "${judgeDir}"
 }
 
 function runSolution() {
@@ -107,10 +123,7 @@ function runSolution() {
 loadConfig
 loadOptions "$@"
 
-if [ $? == 255 ]
-then
-    exit
-elif [ "${solution}" = "" ]
+if [ "${solution}" = "" ]
 then
     echo "Please input solution id"
     wrongOption
