@@ -3,7 +3,7 @@
 justRun=0
 language="CXX"
 solution=""
-configFile="config.sh"
+configName="config"
 
 # read from config.sh
 projectRoot=""
@@ -19,7 +19,12 @@ function loadConfig() {
 #        eval "${line}"
 #    done < ${configFile}
 
-    source ${configFile}
+    source "${configName}.sh"
+
+    if [[ $1 = "" ]]
+    then
+        source "${configName}$1.sh"
+    fi
 }
 
 function wrongOption() {
@@ -30,9 +35,10 @@ function helpDoc() {
     echo "usage: build <solution> [-r] [-k | -c]
     <solution>: 题解名称, 如 P1000
     [-r]: 仅运行题解
-    [-k | -c]: 题解的语言, 默认为 \"CXX\"
+    [-k | -c | -h]: 题解的语言, 默认为 \"CXX\"
             -k 为 Kotlin
-            -c 为 CXX"
+            -c 为 CXX
+            -h 为 Haskell"
 }
 
 # 返回 0 表示无错误
@@ -41,35 +47,19 @@ function loadOptions() {
     # 读入运行选项
     for param in "$@"
     do
-        if [ "${param:0:1}" = "-" ]
+        if [[ "${param:0:1}" = "-" ]]
         then
-            local option=${param:1}
-#            if [ "${option}" = "r" ]
-#            then
-#                justRun=1
-#            elif [ "${option}" = "k" ]
-#            then
-#                language="Kotlin"
-#            elif [ "${option}" = "c" ]
-#            then
-#                language="CXX"
-#            elif [ "${option}" = "help" ]
-#            then
-#                helpDoc
-#                exit
-#            else
-#                echo "Unknown command '-${option}'"
-#                wrongOption
-#                exit
-#            fi
+            local option="${param:1}"
             case "${option}" in
             "r")
                justRun=1 ;;
 
-            "k")
+            "k"|"kt"|"kotlin")
                 language="Kotlin" ;;
-            "c")
+            "c"|"cpp")
                 language="CXX" ;;
+            "h"|"hs"|"haskell")
+                language="Haskell" ;;
             "help")
                 helpDoc
                 exit ;;
@@ -79,7 +69,7 @@ function loadOptions() {
                 exit ;;
             esac
         else
-            solution=${param}
+            solution="${param}"
         fi
     done
 
@@ -90,11 +80,35 @@ function preRunKotlin() {
     echo "Compiling ${solution}.kt"
     kotlinc -d "${buildDir}/kotlin/" "${sourceDir}/${solution}.kt"
 
-    local content="#!/usr/bin/env bash\n
-cd ${buildDir}/kotlin\n
+    local content="#!/usr/bin/env bash
+cd ${buildDir}/kotlin
 kotlin ${solution}Kt"
 
-    echo -e "${content}" > "${genTarget}"
+    echo "${content}" > "${genTarget}"
+}
+
+function preRunHaskell() {
+    local hsDir="${buildDir}/haskell"
+#    echo "Copying source code"
+#    cp "${sourceDir}/${solution}.hs" "${hsDir}"
+
+    local content="module Main where
+import ${projectName}.${solution}
+
+main :: IO ()
+main = ${projectName}.${solution}.mMain
+"
+
+    echo "${content}" > "${genTarget}.hs"
+
+    cd "${hsDir}"
+
+    echo "Compiling ${solution}.hs"
+    ghc "${sourceDir}/${solution}.hs" "${genTarget}.hs"
+
+    cd "${sourceDir}"
+    rm *.hi
+    rm *.o
 }
 
 function preRunCXX() {
@@ -106,30 +120,33 @@ function preRunCXX() {
 
     cd "${buildDir}"
     make
-    cd "${judgeDir}"
 }
 
 function runSolution() {
     echo "See https://www.luogu.org/problemnew/show/${solution} for more information"
-    if [ "${justRun}" == 1 ]
+
+    chmod +x "${genTarget}"
+
+    if [[ "${justRun}" == 1 ]]
     then
         ${genTarget}
     else
         echo "Running judge script"
-        ${judgeDir}/judge.kts ${solution} ${projectRoot} ${projectName}
+        ${judgeDir}/judge.kts "${solution}" "${projectRoot}" "${projectName}"
     fi
 }
 
 loadConfig
 loadOptions "$@"
 
-if [ "${solution}" = "" ]
+if [[ "${solution}" = "" ]]
 then
     echo "Please input solution id"
     wrongOption
 else
     # 根据运行选项生成不同的运行程序
     preRun${language}
+    cd "${judgeDir}"
 
     # 运行生成后的程序
     runSolution
