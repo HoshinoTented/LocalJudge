@@ -89,14 +89,12 @@ kotlin ${solution}Kt"
 
 function preRunHaskell() {
     local hsDir="${buildDir}/haskell"
-#    echo "Copying source code"
-#    cp "${sourceDir}/${solution}.hs" "${hsDir}"
 
     local content="module Main where
 import ${projectName}.${solution}
 
 main :: IO ()
-main = ${projectName}.${solution}.mMain
+main = ${projectName}.${solution}.main'
 "
 
     echo "${content}" > "${genTarget}.hs"
@@ -132,7 +130,7 @@ function runSolution() {
         ${genTarget}
     else
         echo "Running judge script"
-        ${judgeDir}/judge.kts "${solution}" "${projectRoot}" "${projectName}"
+        ${judgeDir}/judge.kts "problem=${solution}" "prefix=${projectRoot}" "name=${projectName}"
     fi
 }
 
