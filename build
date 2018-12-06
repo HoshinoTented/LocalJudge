@@ -28,7 +28,7 @@ function loadConfig() {
 }
 
 function wrongOption() {
-    echo "Use \"-help\" to get more infomation"
+    echo "Use \"--help\" to get more infomation"
 }
 
 function helpDoc() {
@@ -38,7 +38,9 @@ function helpDoc() {
     [-k | -c | -h]: 题解的语言, 默认为 \"CXX\"
             -k 为 Kotlin
             -c 为 CXX
-            -h 为 Haskell"
+            -h 为 Haskell
+    例如, 仅运行(不进行评测) P1000 的 Haskell 题解:
+    build -h -r P1000"
 }
 
 # 返回 0 表示无错误
@@ -60,7 +62,7 @@ function loadOptions() {
                 language="CXX" ;;
             "h"|"hs"|"haskell")
                 language="Haskell" ;;
-            "help")
+            "help"|"-help")
                 helpDoc
                 exit ;;
             *)
@@ -77,36 +79,31 @@ function loadOptions() {
 }
 
 function preRunKotlin() {
+    cd "${buildDir}"
+    echo "Copying source file"
+    cp "${sourceDir}/${solution}.kt" "."
+
+    echo "
+fun main() = ${solution}.main()" >> "${solution}.kt"
+
     echo "Compiling ${solution}.kt"
-    kotlinc -d "${buildDir}/kotlin/" "${sourceDir}/${solution}.kt"
+    kotlinc "${solution}.kt"
 
     local content="#!/usr/bin/env bash
-cd ${buildDir}/kotlin
+cd ${buildDir}
 kotlin ${solution}Kt"
 
     echo "${content}" > "${genTarget}"
 }
 
 function preRunHaskell() {
-    local hsDir="${buildDir}/haskell"
-
-    local content="module Main where
-import ${projectName}.${solution}
-
-main :: IO ()
-main = ${projectName}.${solution}.main'
-"
-
-    echo "${content}" > "${genTarget}.hs"
-
-    cd "${hsDir}"
+    echo -n "-- " > "${genTarget}.hs"
+    cat "${sourceDir}/${solution}.hs" >> "${genTarget}.hs"
 
     echo "Compiling ${solution}.hs"
-    ghc "${sourceDir}/${solution}.hs" "${genTarget}.hs"
+    ghc "${genTarget}.hs"
 
     cd "${sourceDir}"
-    rm *.hi
-    rm *.o
 }
 
 function preRunCXX() {

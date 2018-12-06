@@ -60,14 +60,16 @@ fun loadParams() : Map<String, String> {
 
 val config : Map<String, String> = loadParams()
 
-val pid = config["problem"] ?: throw IllegalArgumentException("Please input problem id, use param '-p <problem id>'")
-val prefix = config["prefix"] ?: throw IllegalArgumentException("Please input path's prefix, use param '-P <prefix>'")
-val projectName = config["name"] ?: throw IllegalArgumentException("Please input project name, use param '-n <name>'")
+val pid = config["problem"] ?: throw IllegalArgumentException("Please input problem id, use param 'problem=<problem id>'")
+val prefix = config["prefix"] ?: throw IllegalArgumentException("Please input path's prefix, use param 'prefix=<prefix>'")
+val projectName = config["name"] ?: throw IllegalArgumentException("Please input project name, use param 'name=<name>'")
 val inFileName = config["in"] ?: "in.txt"
 val outFileName = config["out"] ?: "out.txt"
 val testDir = File("$prefix/test/$pid/")
 val executable = "$prefix/build/$projectName"
-val runtime : Runtime = Runtime.getRuntime()
+val runtime : Runtime = Runtime.getRuntime().apply {
+	exec("echo init")
+}
 
 
 if (! testDir.exists()) throw JudgeException(pid, "No found test data")
