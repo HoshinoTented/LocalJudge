@@ -93,14 +93,14 @@ testDir.listFiles()?.forEach {
 		println("Testing ${it.name}...")
 
 		val inFile = Paths.get(it.path, inFileName).toFile().takeIf(File::exists) ?: Paths.get(it.path, "testdata.in").toFile().takeIf(File::exists) ?: throw JudgeException(pid, "Not found input test data")
-		val outFile = Paths.get(it.path, outFileName).toFile().takeIf(File::exists) ?: Paths.get(it.path, "testdata.out").toFile().takeIf(File::exists) ?: throw JudgeException(pid, "Not found output test data")
 		val output = File("$outputDir/${it.name}.out")
-
 		val usedTime = process(inFile.inputStream(), output.outputStream())
 
 		println("use $usedTime ms")
 
 		if (withoutCompare.not()) {
+			val outFile = Paths.get(it.path, outFileName).toFile().takeIf(File::exists) ?: Paths.get(it.path, "testdata.out").toFile().takeIf(File::exists) ?: throw JudgeException(pid, "Not found output test data")
+			
 			println("Comparing")
 			compare(pid, output.inputStream(), outFile.inputStream())
 			println("Accepted!!")
