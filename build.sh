@@ -4,6 +4,7 @@ justRun=0
 language="CXX"
 solution=""
 configName="config"
+compare="true"
 
 # read from config.sh
 projectRoot=""
@@ -62,6 +63,8 @@ function loadOptions() {
                 language="CXX" ;;
             "h"|"hs"|"haskell")
                 language="Haskell" ;;
+	    "withoutCompare")
+		compare="false" ;;
             "help"|"-help")
                 helpDoc
                 exit ;;
@@ -126,8 +129,9 @@ function runSolution() {
     then
         ${genTarget}
     else
+        rm ${projectRoot}/output/*
         echo "Running judge script"
-        ${judgeDir}/judge.kts "problem=${solution}" "prefix=${projectRoot}" "name=${projectName}"
+        ${judgeDir}/src/judge.kts "problem=${solution}" "prefix=${projectRoot}" "name=${projectName}" "compare=${compare}"
     fi
 }
 
