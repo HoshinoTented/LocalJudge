@@ -8,3 +8,7 @@ config.sh
 # intellij
 .idea/
 *.iml
+
+# gradle
+.gradle/
+build/
